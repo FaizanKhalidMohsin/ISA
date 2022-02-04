@@ -5,6 +5,9 @@ ourNamesInd = read_csv("ColumnNameLookupInd.csv")
 dd_raw = read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, na = c(""," ", "N / A"))
 
 dd = dd_raw %>% 
+  mutate(NumPubs_PatentApps = as.numeric(NumPubs_PatentApps) # correct data type
+         , NumPubs_Patents = as.numeric(NumPubs_Patents)
+         ) %>% 
   mutate( Country = str_to_title(Country)
         , Country = case_when(  str_detect(Country, 'Alice|Botsawana')       ~ 'Botswana'
                               , str_detect(Country, 'Trinidad|Tobago')       ~ "Trinidad &\nTobago" 
@@ -75,12 +78,18 @@ dd = dd_raw %>%
                                                    , str_detect(iWomenMinorityOverlooked_Ed, 'Yes') ~  'Inequitable \nTreatment')
         , AwareGenderPayGap_Ed = case_when(str_detect(AwareGenderPayGap_Ed, 'Yes') ~ 'Yes, men make more' 
                                            , TRUE ~ AwareGenderPayGap_Ed)
+        
         , NumPubs_Articles = if_else(NumPubs_Articles == 0.1, 0, NumPubs_Articles)
+        , NumPubs_Books = if_else(NumPubs_Books == 0.1, 0, NumPubs_Books)
+        , NumPubs_Chapters = if_else(NumPubs_Chapters == 0.1, 0, NumPubs_Chapters)
+        , NumPubs_PatentApps = if_else(NumPubs_PatentApps == 0.1, 0, NumPubs_PatentApps)
+        , NumPubs_Patents = if_else(NumPubs_Patents == 0.1, 0, NumPubs_Patents)
         
-        
-  )
+  
+  ) 
 
-
+# ) %>% mutate_at(vars(contains("NumPubs")), list(~case_when(.==0.1 ~ 0  
+#                                                            , TRUE ~ .x )
         
 pretty_strings <- function(string) {
   # If only one space, replace with \n
