@@ -84,21 +84,14 @@ dd = dd_raw %>%
         , NumPubs_Chapters = if_else(NumPubs_Chapters == 0.1, 0, NumPubs_Chapters)
         , NumPubs_PatentApps = if_else(NumPubs_PatentApps == 0.1, 0, NumPubs_PatentApps)
         , NumPubs_Patents = if_else(NumPubs_Patents == 0.1, 0, NumPubs_Patents)
+        ## Try to replace NumPubs with one line code below. right now .x does not work.
+        ## %>% mutate_at(vars(contains("NumPubs")), list(~case_when(.==0.1 ~ 0  
+        ##                                                          , TRUE ~ .x )
         
         , AwareGenderPayGap = coalesce(AwareGenderPayGap, AwareGenderPayGap_Ed)
 
-        
-  
-  ) # %>% select(-ends_with("_Ed"))
-
-# ) %>% mutate_at(vars(contains("NumPubs")), list(~case_when(.==0.1 ~ 0  
-#                                                            , TRUE ~ .x )
-        
-
-sensorA = c(1, 91, 6, 32, NA, NA)
-sensorB = c(1, NA, 6, NA, NA, NA)
-sensorC = c(1, 12, 6, 31, 20, NA)
-coalesce(sensorA, sensorB, sensorC)
+  ) %>% # select(-ends_with("_Ed")) %>%
+  saveRDS("ISA_Raw_Ind.rds")        
 
 pretty_strings <- function(string) {
   # If only one space, replace with \n
@@ -110,8 +103,7 @@ pretty_strings <- function(string) {
 
 
 
-# %>%
-  #saveRDS("ISA_Raw_Ind.rds")
+
 
 table(dd$Country)
 table(dd[[2]])
