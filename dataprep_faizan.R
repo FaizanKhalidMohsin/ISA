@@ -107,6 +107,11 @@ pretty_strings <- function(string) {
   
 }
 
+de_coalesce <- function(column) {
+  
+  
+}
+
 table_plus <- function(n) {
   print(colnames(dd)[n-1])
   print(table(dd[[n-1]]))
