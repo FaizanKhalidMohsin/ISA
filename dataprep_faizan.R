@@ -85,12 +85,21 @@ dd = dd_raw %>%
         , NumPubs_PatentApps = if_else(NumPubs_PatentApps == 0.1, 0, NumPubs_PatentApps)
         , NumPubs_Patents = if_else(NumPubs_Patents == 0.1, 0, NumPubs_Patents)
         
+        , AwareGenderPayGap = coalesce(AwareGenderPayGap, AwareGenderPayGap_Ed)
+
+        
   
-  ) 
+  ) # %>% select(-ends_with("_Ed"))
 
 # ) %>% mutate_at(vars(contains("NumPubs")), list(~case_when(.==0.1 ~ 0  
 #                                                            , TRUE ~ .x )
         
+
+sensorA = c(1, 91, 6, 32, NA, NA)
+sensorB = c(1, NA, 6, NA, NA, NA)
+sensorC = c(1, 12, 6, 31, 20, NA)
+coalesce(sensorA, sensorB, sensorC)
+
 pretty_strings <- function(string) {
   # If only one space, replace with \n
   # if 2 spaces, put beside longest word
