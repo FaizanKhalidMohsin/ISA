@@ -75,7 +75,9 @@ dd = dd_raw %>%
                                                    , str_detect(iWomenMinorityOverlooked_Ed, 'Yes') ~  'Inequitable \nTreatment')
         , AwareGenderPayGap_Ed = case_when(str_detect(AwareGenderPayGap_Ed, 'Yes') ~ 'Yes, men make more' 
                                            , TRUE ~ AwareGenderPayGap_Ed)
-        , NumPubs_Articles = ifelse(NumPubs_Articles == 0.1, 0, NumPubs_Articles)
+        , NumPubs_Articles = if_else(NumPubs_Articles == 0.1, 0, NumPubs_Articles)
+        
+        
   )
 
 
