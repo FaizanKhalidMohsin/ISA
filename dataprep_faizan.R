@@ -100,10 +100,19 @@ dd = dd_raw %>%
 dfTest = readRDS("ISA_Raw_Ind.rds")
 
 pretty_strings <- function(string) {
+  
+  blankCount = str_count(string, pattern = " ")
+  
   # If only one space, replace with \n
-  # if 2 spaces, put beside longest word
-  # If 3 spaces, put after 2nd one
-  # If 4 or more, put every 2nd space
+  if(blankCount == 1){
+    
+  } else if (blankCount == 2) { # if 2 spaces, put beside longest word
+    
+  } else if (blankCount == 3) { # If 3 spaces, put after 2nd one
+    
+  } else if (blankCount > 3) { # If 4 or more, put every 2nd space
+    
+  }
   
 }
 
