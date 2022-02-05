@@ -88,7 +88,7 @@ dd = dd_raw %>%
         , NumPubs_PatentApps             = if_else(NumPubs_PatentApps == 0.1, 0, NumPubs_PatentApps)
         , NumPubs_Patents                = if_else(NumPubs_Patents == 0.1, 0, NumPubs_Patents)
         
-        ## Try to replace NumPubs with one line code below. 
+        ## Try to replace the above NumPubs with one line code as below. 
         ## %>% mutate_at(vars(contains("NumPubs")), list(~case_when(.==0.1 ~ 0  
         ##                                                          , TRUE ~ .x ) # Right now this .x does not work.
         
@@ -105,7 +105,7 @@ pretty_strings <- function(string) {
   
   # If only one space, replace with \n
   if(blankCount == 1){
-    
+    str_replace(string, " ", "\n")
   } else if (blankCount == 2) { # if 2 spaces, put beside longest word
     
   } else if (blankCount == 3) { # If 3 spaces, put after 2nd one
