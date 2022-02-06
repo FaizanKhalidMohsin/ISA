@@ -91,9 +91,25 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, 
           , NumPubs_PatentApps             = if_else(NumPubs_PatentApps == 0.1, 0, NumPubs_PatentApps)
           , NumPubs_Patents                = if_else(NumPubs_Patents == 0.1, 0, NumPubs_Patents)
           
-          ## Try to replace NumPubs with one line code below. 
-          ## %>% mutate_at(vars(contains("NumPubs")), list(~case_when(.==0.1 ~ 0  
-          ##                                                          , TRUE ~ .x ) # Right now this .x does not work.
+          ## Try to replace the above NumPubs_* with one line code as below. 
+          ## %>% mutate_at(vars(contains("NumPubs")), list(~case_when(.==0.1 ~ 0, TRUE ~ .x ) # Right now this .x does not work.
+          
+          
+          ## All variables to de-coalesce and count
+          , EconomicOpportunity = case_when(str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
+                                            , is.na(PersonalEngagement) ~ NA_real_
+                                            , TRUE ~ 0)
+          
+          , Conservation = case_when(str_detect(PersonalEngagement, pattern = "Conservation") ~ 1
+                                     , is.na(PersonalEngagement) ~ NA_real_
+                                     , TRUE ~ 0)
+          
+          , CapacityDevelopment = case_when(str_detect(PersonalEngagement, pattern = "Capacity development") ~ 1
+                                            , is.na(PersonalEngagement) ~ NA_real_
+                                            , TRUE ~ 0)
+          
+          
+          
           
           ## Coalesce all _Ed variables
           , AwareGenderPayGap = coalesce(AwareGenderPayGap, AwareGenderPayGap_Ed)
