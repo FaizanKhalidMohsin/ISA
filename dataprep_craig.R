@@ -121,7 +121,29 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, 
   left_join(countryLookup, by = "Country") %>%
   saveRDS("ISA_Raw_Ind.rds")
 
+## Testing
 dd = readRDS("ISA_Raw_Ind.rds")
+
+dd %>% select(EconomicOpportunity:CapacityDevelopment)
+
+toto = dd %>% 
+  select(PersonalEngagement) %>% 
+  mutate(EconomicOpportunity = case_when(str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
+                                         , is.na(PersonalEngagement) ~ NA_real_
+                                         , TRUE ~ 0)
+         
+         , Conservation = case_when(str_detect(PersonalEngagement, pattern = "Conservation") ~ 1
+                                    , is.na(PersonalEngagement) ~ NA_real_
+                                    , TRUE ~ 0)
+         
+         , CapacityDevelopment = case_when(str_detect(PersonalEngagement, pattern = "Capacity development") ~ 1
+                                           , is.na(PersonalEngagement) ~ NA_real_
+                                           , TRUE ~ 0)
+  )
+
+
+
+
 
 read_csv("Institutional Survey.csv") %>%
   rename(Country = `Please enter the name of your country.`) %>%
