@@ -88,10 +88,24 @@ dd = dd_raw %>%
         , NumPubs_PatentApps             = if_else(NumPubs_PatentApps == 0.1, 0, NumPubs_PatentApps)
         , NumPubs_Patents                = if_else(NumPubs_Patents == 0.1, 0, NumPubs_Patents)
         
-        ## Try to replace the above NumPubs with one line code as below. 
-        ## %>% mutate_at(vars(contains("NumPubs")), list(~case_when(.==0.1 ~ 0  
-        ##                                                          , TRUE ~ .x ) # Right now this .x does not work.
+        ## Try to replace the above NumPubs_* with one line code as below. 
+        ## %>% mutate_at(vars(contains("NumPubs")), list(~case_when(.==0.1 ~ 0, TRUE ~ .x ) # Right now this .x does not work.
+                                                        
         
+        ## All variables to de-coalesce and count
+        , EconomicOpportunity = case_when(str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
+                                        , is.na(PersonalEngagement) ~ NA_real_
+                                        , TRUE ~ 0)
+        
+        , Conservation = case_when(str_detect(PersonalEngagement, pattern = "Conservation") ~ 1
+                                   , is.na(PersonalEngagement) ~ NA_real_
+                                   , TRUE ~ 0)
+        
+        , CapacityDevelopment = case_when(str_detect(PersonalEngagement, pattern = "Capacity development") ~ 1
+                                          , is.na(PersonalEngagement) ~ NA_real_
+                                          , TRUE ~ 0)
+        
+        # All variables to Coalesce
         , AwareGenderPayGap = coalesce(AwareGenderPayGap, AwareGenderPayGap_Ed)
 
   ) %>% # select(-ends_with("_Ed")) %>%
@@ -99,22 +113,6 @@ dd = dd_raw %>%
 
 dfTest = readRDS("ISA_Raw_Ind.rds")
 
-dfTest %>% pull(PersonalEngagement) %>% unique() %>% str_split(pattern = ";", simplify = TRUE) %>% as.vector() %>% unique() #%>% str_split_fixed(pattern = ";", n = 5)
-
-dfTest %>% pull(PersonalEngagement) %>% str_split(pattern = ";", simplify = TRUE)  %>%  as.vector() %>% unique() #%>% str_split_fixed(pattern = ";", n = 5)
-
-dfTest %>% pull(PersonalEngagement) %>% str_split(pattern = ";", simplify = TRUE)
-
-dfTest %>% select(PersonalEngagement) %>% separate(col="PersonalEngagement", into = paste0("PersonalEngagement", 1:3), sep = ";", fill = "right" ) %>% 
-  mutate(EconomicOpportunity = case_when(PersonalEngagement1 == "Economic opportunity"  ))
-
-
-
-dfTest %>% 
-  select(PersonalEngagement) %>% 
-  mutate(EconomicOpportunity = case_when(str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
-                                         , TRUE ~ 0)
-  ) %>% str()
 
 toto = dfTest %>% 
   select(PersonalEngagement) %>% 
@@ -132,21 +130,7 @@ toto = dfTest %>%
   )
 
 
-dfTest %>% 
-  select(PersonalEngagement) %>% 
-  mutate(EconomicOpportunity = case_when(is.na(PersonalEngagement) ~ PersonalEngagement
-                                         , str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
-                                         , TRUE ~ 0)
-  )
 
-print(dfTest %>% select(PersonalEngagement) %>% 
-  extract(col = PersonalEngagement, into = c("Economic opportunity", "Conservation", "Capacity development"), 
-          regex = "E(.*)Cons(.*)Ca(.*)")
-)
-
-dfTest %>% select(PersonalEngagement) %>% 
-  extract(col = PersonalEngagement, into = c("Economic opportunity", "Conservation", "Capacity development"), 
-          regex = "Economic(Economic.*)Conservation(Conservation.*)Capacity(Capacity.*)")
 
 pretty_strings <- function(string) {
   
@@ -165,10 +149,7 @@ pretty_strings <- function(string) {
   
 }
 
-de_coalesce <- function(column) {
-  
-  
-}
+
 
 
 
