@@ -108,14 +108,23 @@ dd = dd_raw %>%
         # All variables to Coalesce
         , AwareGenderPayGap = coalesce(AwareGenderPayGap, AwareGenderPayGap_Ed)
 
-  ) %>% # select(-ends_with("_Ed")) %>%
+  ) %>% 
+  # select(-ends_with("_Ed")) %>%
   saveRDS("ISA_Raw_Ind.rds")        
 
-dfTest = readRDS("ISA_Raw_Ind.rds")
+dd = readRDS("ISA_Raw_Ind.rds")
 
-dfTest %>% select(EconomicOpportunity:CapacityDevelopment)
+dd %>% select(NewPositionReason) %>% distinct()  
+dd %>% select(NewPositionReason) %>% table()
 
-toto = dfTest %>% 
+
+# Count total number of responses per column
+dd %>% summarise(across(everything(), ~ sum(!is.na(.)))) %>%  t() %>% write.csv(file = "n_per_column.csv")
+dd %>% summarise(across(everything(), ~ sum(!is.na(.)))) %>%  pivot_longer() # Does not work. 
+
+dd %>% select(EconomicOpportunity:CapacityDevelopment)
+
+toto = dd %>% 
   select(PersonalEngagement) %>% 
   mutate(EconomicOpportunity = case_when(str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
                                       , is.na(PersonalEngagement) ~ NA_real_
