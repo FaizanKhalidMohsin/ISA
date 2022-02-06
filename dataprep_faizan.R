@@ -113,6 +113,7 @@ dd = dd_raw %>%
 
 dfTest = readRDS("ISA_Raw_Ind.rds")
 
+dfTest %>% select(EconomicOpportunity:CapacityDevelopment)
 
 toto = dfTest %>% 
   select(PersonalEngagement) %>% 
