@@ -105,10 +105,48 @@ dfTest %>% pull(PersonalEngagement) %>% str_split(pattern = ";", simplify = TRUE
 
 dfTest %>% pull(PersonalEngagement) %>% str_split(pattern = ";", simplify = TRUE)
 
-dfTest %>% select(PersonalEngagement) %>% separate(col="PersonalEngagement", into = paste0("PersonalEngagement", 1:3), sep = ";", fill = "right" )
+dfTest %>% select(PersonalEngagement) %>% separate(col="PersonalEngagement", into = paste0("PersonalEngagement", 1:3), sep = ";", fill = "right" ) %>% 
+  mutate(EconomicOpportunity = case_when(PersonalEngagement1 == "Economic opportunity"  ))
 
 
 
+dfTest %>% 
+  select(PersonalEngagement) %>% 
+  mutate(EconomicOpportunity = case_when(str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
+                                         , TRUE ~ 0)
+  ) %>% str()
+
+toto = dfTest %>% 
+  select(PersonalEngagement) %>% 
+  mutate(EconomicOpportunity = case_when(str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
+                                      , is.na(PersonalEngagement) ~ NA_real_
+                                      , TRUE ~ 0)
+         
+         , Conservation = case_when(str_detect(PersonalEngagement, pattern = "Conservation") ~ 1
+                                           , is.na(PersonalEngagement) ~ NA_real_
+                                           , TRUE ~ 0)
+         
+         , CapacityDevelopment = case_when(str_detect(PersonalEngagement, pattern = "Capacity development") ~ 1
+                                           , is.na(PersonalEngagement) ~ NA_real_
+                                           , TRUE ~ 0)
+  )
+
+
+dfTest %>% 
+  select(PersonalEngagement) %>% 
+  mutate(EconomicOpportunity = case_when(is.na(PersonalEngagement) ~ PersonalEngagement
+                                         , str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
+                                         , TRUE ~ 0)
+  )
+
+print(dfTest %>% select(PersonalEngagement) %>% 
+  extract(col = PersonalEngagement, into = c("Economic opportunity", "Conservation", "Capacity development"), 
+          regex = "E(.*)Cons(.*)Ca(.*)")
+)
+
+dfTest %>% select(PersonalEngagement) %>% 
+  extract(col = PersonalEngagement, into = c("Economic opportunity", "Conservation", "Capacity development"), 
+          regex = "Economic(Economic.*)Conservation(Conservation.*)Capacity(Capacity.*)")
 
 pretty_strings <- function(string) {
   
