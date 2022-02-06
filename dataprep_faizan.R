@@ -120,7 +120,6 @@ dd %>% select(NewPositionReason) %>% table()
 
 # Count total number of responses per column
 dd %>% summarise(across(everything(), ~ sum(!is.na(.)))) %>%  t() %>% write.csv(file = "n_per_column.csv")
-dd %>% summarise(across(everything(), ~ sum(!is.na(.)))) %>%  pivot_longer() # Does not work. 
 
 dd %>% select(EconomicOpportunity:CapacityDevelopment)
 
@@ -158,10 +157,6 @@ pretty_strings <- function(string) {
   }
   
 }
-
-
-
-
 
 
 table_plus <- function(n) {
