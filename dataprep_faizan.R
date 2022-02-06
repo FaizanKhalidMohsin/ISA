@@ -99,6 +99,17 @@ dd = dd_raw %>%
 
 dfTest = readRDS("ISA_Raw_Ind.rds")
 
+dfTest %>% pull(PersonalEngagement) %>% unique() %>% str_split(pattern = ";", simplify = TRUE) %>% as.vector() %>% unique() #%>% str_split_fixed(pattern = ";", n = 5)
+
+dfTest %>% pull(PersonalEngagement) %>% str_split(pattern = ";", simplify = TRUE)  %>%  as.vector() %>% unique() #%>% str_split_fixed(pattern = ";", n = 5)
+
+dfTest %>% pull(PersonalEngagement) %>% str_split(pattern = ";", simplify = TRUE)
+
+dfTest %>% select(PersonalEngagement) %>% separate(col="PersonalEngagement", into = paste0("PersonalEngagement", 1:3), sep = ";", fill = "right" )
+
+
+
+
 pretty_strings <- function(string) {
   
   blankCount = str_count(string, pattern = " ")
@@ -120,6 +131,9 @@ de_coalesce <- function(column) {
   
   
 }
+
+
+
 
 table_plus <- function(n) {
   print(colnames(dd)[n-1])
