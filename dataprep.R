@@ -12,17 +12,25 @@ fix_gender_col <- function(x) {
 }
 
 sep_col <- function(dfr, colName = "PersonalEngagement") {
-
-  dfr %>%
+  
+  new_columns_as_dataframe = dfr %>%
     pull(colName) %>%
     str_split(pattern = ";", simplify = TRUE) %>%
     as.data.frame() %>%
     mutate(ID = row_number()) %>%
     pivot_longer(starts_with("V")) %>%
     filter(value != "") %>%
-    pivot_wider(id_cols = ID, names_from = value)
+    pivot_wider(id_cols = ID, names_from = value) %>% 
+    select(-ID)
   
+  sepColumnNames = new_columns_as_dataframe %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "")
+  colnames(new_columns_as_dataframe) = sepColumnNames
+  
+  dfr = bind_cols(dfr, new_columns_as_dataframe)
+  dfr
 }
+
+sep_col(dd)
 
 read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, na = c(""," ", "N / A")) %>%
   
@@ -90,30 +98,33 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, 
           
           
           ## All variables to de-coalesce and count
-          , EconomicOpportunity = case_when(str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
-                                            , is.na(PersonalEngagement) ~ NA_real_
-                                            , TRUE ~ 0)
-          
-          , Conservation = case_when(str_detect(PersonalEngagement, pattern = "Conservation") ~ 1
-                                     , is.na(PersonalEngagement) ~ NA_real_
-                                     , TRUE ~ 0)
-          
-          , CapacityDevelopment = case_when(str_detect(PersonalEngagement, pattern = "Capacity development") ~ 1
-                                            , is.na(PersonalEngagement) ~ NA_real_
-                                            , TRUE ~ 0)
-          ## Coalesce all _Ed variables
-          , AwareGenderPayGap = coalesce(AwareGenderPayGap, AwareGenderPayGap_Ed)
-          , iDiscrimAtWork = coalesce(iDiscrimAtWork, iDiscrimAtWork_Ed)
+          # , EconomicOpportunity = case_when(str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
+          #                                   , is.na(PersonalEngagement) ~ NA_real_
+          #                                   , TRUE ~ 0)
+          # 
+          # , Conservation = case_when(str_detect(PersonalEngagement, pattern = "Conservation") ~ 1
+          #                            , is.na(PersonalEngagement) ~ NA_real_
+          #                            , TRUE ~ 0)
+          # 
+          # , CapacityDevelopment = case_when(str_detect(PersonalEngagement, pattern = "Capacity development") ~ 1
+          #                                   , is.na(PersonalEngagement) ~ NA_real_
+          #                                   , TRUE ~ 0)
+          # ## Coalesce all _Ed variables
+          # , AwareGenderPayGap = coalesce(AwareGenderPayGap, AwareGenderPayGap_Ed)
+          # , iDiscrimAtWork = coalesce(iDiscrimAtWork, iDiscrimAtWork_Ed)
           
   ) %>% 
+  sep_col() %>% 
   # select(-ends_with("_Ed")) %>%
-  filter(Consent == "I consent") %>%
-  filter(iStudyOrEmployed == "Yes") %>%
-  select(-c(Timestamp, Consent)) %>%
-  left_join(countryLookup, by = "Country") %>%
+  # filter(Consent == "I consent") %>%
+  # filter(iStudyOrEmployed == "Yes") %>%
+  # select(-c(Timestamp, Consent)) %>%
+  #left_join(countryLookup, by = "Country") %>%
   saveRDS("ISA_Raw_Ind.rds")
 
 dd = readRDS("ISA_Raw_Ind.rds")
+colnames(dd)
+
 dd %>% select(-c(starts_with("Helped_")
                  , starts_with("EmploymentSatisfaction_")
                  , starts_with("OrgHavePolicies_")
@@ -121,6 +132,41 @@ dd %>% select(-c(starts_with("Helped_")
                  , starts_with("InstitutionPolicies_")
                  )) %>% 
   saveRDS("ISA_Ind.rds")
+
+
+
+
+sep_col(dd)
+
+dfr = dd %>%
+  pull(colName) %>%
+  str_split(pattern = ";", simplify = TRUE) %>%
+  as.data.frame() %>%
+  mutate(ID = row_number()) %>%
+  pivot_longer(starts_with("V")) %>%
+  filter(value != "") %>%
+  pivot_wider(id_cols = ID, names_from = value) %>% 
+  select(-ID)
+  
+sepColumnNames = dfr %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "")
+
+colnames(dfr) = sepColumnNames
+dfr
+
+sepColumnNames = dfr %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "")
+
+dfr = dd %>%
+  pull(colName) %>%
+  str_split(pattern = ";", simplify = TRUE) %>%
+  as.data.frame() %>%
+  mutate(ID = row_number()) %>%
+  pivot_longer(starts_with("V")) %>%
+  filter(value != "") %>%
+  pivot_wider(id_cols = ID, names_from = value) %>% 
+  select(-ID) %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "") %>% 
+  rename_with( ~str_to_title(gsub(" ", "", .x, fixed = TRUE)))
+dfr
+
 
 read_csv("Institutional Survey.csv") %>%
   rename(Country = `Please enter the name of your country.`) %>%
@@ -146,6 +192,8 @@ read_csv("National Survey.csv") %>%
 
 pretty_strings <- function(string) {
   
+  pretty_new_lines = function(x) gsub("([^ ]+ [^ ]+) ", "\\1\n", x)
+  
   blankCount = str_count(string, pattern = " ")
   
   # If only one space, replace with \n
@@ -153,17 +201,19 @@ pretty_strings <- function(string) {
     string = str_replace(string, " ", "\n")
     
   } else if (blankCount == 2) { # if 2 spaces, put beside longest word
-    string = pretty_new_line(string)
+    string = pretty_new_lines(string)
     
   } else if (blankCount == 3) { # If 3 spaces, put after 2nd one
-    string = pretty_new_line(string)
+    string = pretty_new_lines(string)
     
   } else if (blankCount > 3) { # If 4 or more, put every 2nd space
-    string = pretty_new_line(string)
+    string = pretty_new_lines(string)
     
   }
-  
+  return(string)
 }
+
+
 
 table_plus <- function(n) {
   print(colnames(dd)[n-1])
