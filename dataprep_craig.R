@@ -167,9 +167,9 @@ pretty_strings <- function(string) {
 }
 
 table_plus <- function(n) {
-  print(colnames(dd)[n-1])
-  print(table(dd[[n-1]]))
-  print(colnames(dd)[n-1])
+  print(colnames( dd)[n - 1])
+  print(table(    dd[[n - 1]]))
+  print(colnames( dd)[n - 1])
 }
 
 table_plus(3)

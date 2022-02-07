@@ -2,7 +2,7 @@ library(tidyverse)
 
 ourNamesInd = read_csv("ColumnNameLookupInd.csv")
 
-dd_raw = read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, na = c(""," ", "N / A"))
+dd_raw = read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip = 3, na = c(""," ", "N / A"))
 
 dd = dd_raw %>% 
   mutate(NumPubs_PatentApps = as.numeric(NumPubs_PatentApps) # correct data type
@@ -94,12 +94,12 @@ dd = dd_raw %>%
         
         ## All variables to de-coalesce and count
         , EconomicOpportunity = case_when(str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
-                                        , is.na(PersonalEngagement) ~ NA_real_
-                                        , TRUE ~ 0)
+                                          , is.na(PersonalEngagement) ~ NA_real_
+                                          , TRUE ~ 0)
         
-        , Conservation = case_when(str_detect(PersonalEngagement, pattern = "Conservation") ~ 1
-                                   , is.na(PersonalEngagement) ~ NA_real_
-                                   , TRUE ~ 0)
+        , Conservation        = case_when(str_detect(PersonalEngagement, pattern = "Conservation") ~ 1
+                                          , is.na(PersonalEngagement) ~ NA_real_
+                                          , TRUE ~ 0)
         
         , CapacityDevelopment = case_when(str_detect(PersonalEngagement, pattern = "Capacity development") ~ 1
                                           , is.na(PersonalEngagement) ~ NA_real_
@@ -146,7 +146,7 @@ pretty_strings <- function(string) {
   blankCount = str_count(string, pattern = " ")
   
   # If only one space, replace with \n
-  if(blankCount == 1){
+  if (blankCount == 1) {
     str_replace(string, " ", "\n")
   } else if (blankCount == 2) { # if 2 spaces, put beside longest word
     
@@ -160,9 +160,9 @@ pretty_strings <- function(string) {
 
 
 table_plus <- function(n) {
-  print(colnames(dd)[n-1])
-  print(table(dd[[n-1]]))
-  print(colnames(dd)[n-1])
+  print(colnames(dd)[n - 1])
+  print(table(   dd[[n - 1]]))
+  print(colnames(dd)[n - 1])
 }
 
 table_plus(3)
