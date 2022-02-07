@@ -147,7 +147,7 @@ pretty_strings <- function(string) {
   
   # If only one space, replace with \n
   if (blankCount == 1) {
-    str_replace(string, " ", "\n")
+    string = str_replace(string, " ", "\n")
   } else if (blankCount == 2) { # if 2 spaces, put beside longest word
     
   } else if (blankCount == 3) { # If 3 spaces, put after 2nd one
