@@ -19,9 +19,9 @@ sep_col <- function(dfr, colName = "PersonalEngagement") {
     as.data.frame() %>%
     mutate(ID = row_number()) %>%
     pivot_longer(starts_with("V")) %>%
-    filter(value != "") %>%
+    filter(value != "" | is.na(value)) %>%
     pivot_wider(id_cols = ID, names_from = value) %>% 
-    select(-ID)
+    select(-c("ID", "NA"))
   
   sepColumnNames = new_columns_as_dataframe %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "")
   colnames(new_columns_as_dataframe) = sepColumnNames
@@ -30,9 +30,8 @@ sep_col <- function(dfr, colName = "PersonalEngagement") {
   dfr
 }
 
-sep_col(dd)
 
-read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, na = c(""," ", "N / A")) %>%
+read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, na = c(""," ", "N / A", "N/A")) %>%
   
   mutate( Country = str_to_title(Country)
           
@@ -96,34 +95,40 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, 
           ## Try to replace the above NumPubs_* with one line code as below. 
           ## %>% mutate_at(vars(contains("NumPubs")), list(~case_when(.==0.1 ~ 0, TRUE ~ .x ) # Right now this .x does not work.
           
-          
-          ## All variables to de-coalesce and count
-          # , EconomicOpportunity = case_when(str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
-          #                                   , is.na(PersonalEngagement) ~ NA_real_
-          #                                   , TRUE ~ 0)
-          # 
-          # , Conservation = case_when(str_detect(PersonalEngagement, pattern = "Conservation") ~ 1
-          #                            , is.na(PersonalEngagement) ~ NA_real_
-          #                            , TRUE ~ 0)
-          # 
-          # , CapacityDevelopment = case_when(str_detect(PersonalEngagement, pattern = "Capacity development") ~ 1
-          #                                   , is.na(PersonalEngagement) ~ NA_real_
-          #                                   , TRUE ~ 0)
-          # ## Coalesce all _Ed variables
-          # , AwareGenderPayGap = coalesce(AwareGenderPayGap, AwareGenderPayGap_Ed)
-          # , iDiscrimAtWork = coalesce(iDiscrimAtWork, iDiscrimAtWork_Ed)
-          
   ) %>% 
-  sep_col() %>% 
-  # select(-ends_with("_Ed")) %>%
+  ## All variables to de-coalesce and count
+  sep_col() %>%
+  sep_col(colName = "ReasonsForNotEnoughOppsConferences") %>%
+  sep_col(colName = "NatureWorkDiscrim") %>%
+  sep_col(colName = "BasisWorkDiscrim") %>%
+  sep_col(colName = "TrainingSubsequentActivity") %>%
+  sep_col(colName = "CareerProgressSupport") %>%
+  sep_col(colName = "ProgrammeNotCompleted_WhyEnrol") %>%
+  sep_col(colName = "ProgrammeNotCompleted_WhyNotComplete") %>%
+  sep_col(colName = "InterruptionReasons") %>%
+  sep_col(colName = "PositionsHeld") %>%
+  sep_col(colName = "ProgrammeNotCompleted_WhyEnrol_Ed") %>%
+  sep_col(colName = "ProgrammeNotCompleted_WhyNotComplete_Ed") %>%
+  sep_col(colName = "DifficultFulfillResp_Reasons") %>%
+  sep_col(colName = "ReasonsTurnDownTravel_Ed") %>%
+  sep_col(colName = "NatureWorkDiscrim_Ed") %>%
+  sep_col(colName = "BasisWorkDiscrim_Ed") %>%
+  # # select(-ends_with("_Ed")) %>%
   # filter(Consent == "I consent") %>%
   # filter(iStudyOrEmployed == "Yes") %>%
   # select(-c(Timestamp, Consent)) %>%
-  #left_join(countryLookup, by = "Country") %>%
+  # left_join(countryLookup, by = "Country") %>%
   saveRDS("ISA_Raw_Ind.rds")
 
 dd = readRDS("ISA_Raw_Ind.rds")
 colnames(dd)
+
+
+## Testing.
+
+n <- ncol(dd) 
+n
+dd[, (n - 10):n]
 
 dd %>% select(-c(starts_with("Helped_")
                  , starts_with("EmploymentSatisfaction_")
@@ -134,39 +139,22 @@ dd %>% select(-c(starts_with("Helped_")
   saveRDS("ISA_Ind.rds")
 
 
-
-
-sep_col(dd)
-
-dfr = dd %>%
+new_columns_as_dataframe = dd %>%
   pull(colName) %>%
   str_split(pattern = ";", simplify = TRUE) %>%
   as.data.frame() %>%
   mutate(ID = row_number()) %>%
   pivot_longer(starts_with("V")) %>%
-  filter(value != "") %>%
+  filter(value != "" | is.na(value)) %>%
   pivot_wider(id_cols = ID, names_from = value) %>% 
-  select(-ID)
-  
-sepColumnNames = dfr %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "")
+  select(-c("ID", "NA")) %>% 
+  replace_na(replace = 0)
 
-colnames(dfr) = sepColumnNames
+sepColumnNames = new_columns_as_dataframe %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "")
+colnames(new_columns_as_dataframe) = sepColumnNames
+
+dfr = bind_cols(dfr, new_columns_as_dataframe)
 dfr
-
-sepColumnNames = dfr %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "")
-
-dfr = dd %>%
-  pull(colName) %>%
-  str_split(pattern = ";", simplify = TRUE) %>%
-  as.data.frame() %>%
-  mutate(ID = row_number()) %>%
-  pivot_longer(starts_with("V")) %>%
-  filter(value != "") %>%
-  pivot_wider(id_cols = ID, names_from = value) %>% 
-  select(-ID) %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "") %>% 
-  rename_with( ~str_to_title(gsub(" ", "", .x, fixed = TRUE)))
-dfr
-
 
 read_csv("Institutional Survey.csv") %>%
   rename(Country = `Please enter the name of your country.`) %>%
