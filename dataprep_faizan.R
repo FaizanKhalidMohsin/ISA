@@ -123,6 +123,7 @@ dd %>% summarise(across(everything(), ~ sum(!is.na(.)))) %>%  t() %>% write.csv(
 
 dd %>% select(EconomicOpportunity:CapacityDevelopment)
 
+#de_coalesce()
 toto = dd %>% 
   select(PersonalEngagement) %>% 
   mutate(EconomicOpportunity = case_when(str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
@@ -138,7 +139,29 @@ toto = dd %>%
                                            , TRUE ~ 0)
   )
 
+#de_coalesce()
+de_coalesce <- function(PersonalEngagement) {
+  dd %>% 
+    select(PersonalEngagement) %>% 
+    mutate(EconomicOpportunity = case_when(str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
+                                           , is.na(PersonalEngagement) ~ NA_real_
+                                           , TRUE ~ 0)
+           
+           , Conservation = case_when(str_detect(PersonalEngagement, pattern = "Conservation") ~ 1
+                                      , is.na(PersonalEngagement) ~ NA_real_
+                                      , TRUE ~ 0)
+           
+           , CapacityDevelopment = case_when(str_detect(PersonalEngagement, pattern = "Capacity development") ~ 1
+                                             , is.na(PersonalEngagement) ~ NA_real_
+                                             , TRUE ~ 0)
+    )
+}
 
+
+pretty_new_line = function(x) gsub("([^ ]+ [^ ]+) ", "\\1\n", x)
+
+a <- "this string has an even number of words"
+b <- "this string doesn't have an even number of words"
 
 
 pretty_strings <- function(string) {
@@ -148,11 +171,15 @@ pretty_strings <- function(string) {
   # If only one space, replace with \n
   if (blankCount == 1) {
     string = str_replace(string, " ", "\n")
+    
   } else if (blankCount == 2) { # if 2 spaces, put beside longest word
+    string = pretty_new_line(string)
     
   } else if (blankCount == 3) { # If 3 spaces, put after 2nd one
+    string = pretty_new_line(string)
     
   } else if (blankCount > 3) { # If 4 or more, put every 2nd space
+    string = pretty_new_line(string)
     
   }
   

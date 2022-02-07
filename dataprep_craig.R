@@ -126,24 +126,60 @@ dd = readRDS("ISA_Raw_Ind.rds")
 
 dd %>% select(EconomicOpportunity:CapacityDevelopment)
 
-toto = dd %>% 
-  select(PersonalEngagement) %>% 
-  mutate(EconomicOpportunity = case_when(str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
-                                         , is.na(PersonalEngagement) ~ NA_real_
-                                         , TRUE ~ 0)
-         
-         , Conservation = case_when(str_detect(PersonalEngagement, pattern = "Conservation") ~ 1
-                                    , is.na(PersonalEngagement) ~ NA_real_
-                                    , TRUE ~ 0)
-         
-         , CapacityDevelopment = case_when(str_detect(PersonalEngagement, pattern = "Capacity development") ~ 1
+#de_coalesce()
+de_coalesce <- function(PersonalEngagement) {
+  dd %>% 
+    select(PersonalEngagement) %>% 
+    mutate(EconomicOpportunity = case_when(str_detect(PersonalEngagement, pattern = "Economic opportunity") ~ 1
                                            , is.na(PersonalEngagement) ~ NA_real_
                                            , TRUE ~ 0)
-  )
+           
+           , Conservation = case_when(str_detect(PersonalEngagement, pattern = "Conservation") ~ 1
+                                      , is.na(PersonalEngagement) ~ NA_real_
+                                      , TRUE ~ 0)
+           
+           , CapacityDevelopment = case_when(str_detect(PersonalEngagement, pattern = "Capacity development") ~ 1
+                                             , is.na(PersonalEngagement) ~ NA_real_
+                                             , TRUE ~ 0)
+    )
+}
 
 
+pretty_new_lines = function(x) gsub("([^ ]+ [^ ]+) ", "\\1\n", x)
+
+a <- "this string has an even number of words"
+b <- "this string doesn't have an even number of words"
+
+pretty_new_lines(a)
+pretty_new_lines(b)
 
 
+pretty_strings <- function(string) {
+  
+  pretty_new_lines = function(x) gsub("([^ ]+ [^ ]+) ", "\\1\n", x)
+  
+  blankCount = str_count(string, pattern = " ")
+  
+  # If only one space, replace with \n
+  if (blankCount == 1) {
+    string = str_replace(string, " ", "\n")
+    
+  } else if (blankCount == 2) { # if 2 spaces, put beside longest word
+    string = pretty_new_lines(string)
+    
+  } else if (blankCount == 3) { # If 3 spaces, put after 2nd one
+    string = pretty_new_lines(string)
+    
+  } else if (blankCount > 3) { # If 4 or more, put every 2nd space
+    string = pretty_new_lines(string)
+    
+  }
+  return(string)
+}
+
+pretty_strings(a)
+pretty_strings("my child")
+pretty_strings("My son is")
 
 read_csv("Institutional Survey.csv") %>%
   rename(Country = `Please enter the name of your country.`) %>%
@@ -157,14 +193,6 @@ read_csv("Institutional Survey.csv") %>%
 # dd %>% filter(!is.na(Email)) %>% select(Country, Institution, Email) %>% write_csv("EmailList.csv")
 # dd = read_csv("Institutional Survey.csv")
 # data.frame(InternalName = NA, iBinary = NA, ExternalName = names(dd)) %>% write_csv("ColumnNameLookupInst.csv")
-
-pretty_strings <- function(string) {
-  # If only one space, replace with \n
-  # if 2 spaces, put beside longest word
-  # If 3 spaces, put after 2nd one
-  # If 4 or more, put every 2nd space
-  
-}
 
 table_plus <- function(n) {
   print(colnames( dd)[n - 1])
