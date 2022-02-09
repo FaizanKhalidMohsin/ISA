@@ -1,12 +1,40 @@
 library(tidyverse)
 source("Helpers.R")
 
+
+sep_col <- function(dfr, colName = "PersonalEngagement") {
+  
+  new_columns_as_dataframe = dfr %>%
+    pull(colName) %>%
+    str_split(pattern = ";", simplify = TRUE) %>%
+    as.data.frame() %>%
+    mutate(ID = row_number()) %>%
+    pivot_longer(starts_with("V")) %>%
+    filter(value != "" | is.na(value)) %>%
+    pivot_wider(id_cols = ID, names_from = value) %>% 
+    select(-c("ID", "NA")) %>% 
+    # Using replace() & replace_na() instead of ifelse() or if_else() due to speed.
+    mutate(across(everything(), ~replace(., !is.na(.), 1))) %>%
+    mutate(across(everything(), .fns = ~replace_na(.,0))) 
+  
+  # Using Tyler the Great's naming convention.
+  sepColumnNames = new_columns_as_dataframe %>% 
+    colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "_") %>% 
+    paste(str_to_upper(colName), ., sep = "_")
+  
+  colnames(new_columns_as_dataframe) = sepColumnNames
+  
+  dfr = bind_cols(dfr, new_columns_as_dataframe)
+  dfr
+}
+
+
 countryLookup = read_csv("ISA – WIDSR – Country Lookup.csv", n_max = 17, na = c("N/A")) %>%
   select(Country:GGI)
 
 ourNamesInd = read_csv("ColumnNameLookupInd.csv")
 
-read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, na = c(""," ", "N / A")) %>%
+read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip = 3, na = c(""," ", "N / A")) %>%
   
   mutate( Country = str_to_title(Country)
           
@@ -117,26 +145,26 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, 
   select(-ends_with("_Ed")) %>% # Remove '_Ed' variables now, they have been coalesced
   
   ## All variables to de-coalesce and count
-  # TODO: Faizan - These need to be prefixed with the original column name
-  # TODO: Faizan - Instead of removing spaces, replace with __ so that you can replace with a space downstream, otherwise it's unreadable
+  # DONE: Faizan - These need to be prefixed with the original column name
+  # DONE: Faizan - Instead of removing spaces, replace with __ so that you can replace with a space downstream, otherwise it's unreadable
   # TODO: Faizan - Clean up Grants* columns - some of the regions overlap and can now be combined
   # TODO: Faizan - 
   # TODO: Faizan - 
   # TODO: Faizan - 
-  # sep_col("PersonalEngagement") %>%
-  # sep_col("PeopleInfluenced") %>%
-  # sep_col("ReasonsForLeavingJob") %>%
-  # sep_col("ReasonsForNotEnoughOppsConferences") %>%
-  # sep_col("NatureWorkDiscrim") %>%
-  # sep_col("BasisWorkDiscrim") %>%
-  # sep_col("TrainingSubsequentActivity") %>%
-  # sep_col("CareerProgressSupport") %>%
-  # sep_col("ProgrammeNotCompleted_WhyEnrol") %>%
-  # sep_col("ProgrammeNotCompleted_WhyNotComplete") %>%
-  # sep_col("InterruptionReasons") %>%
-  # sep_col("PositionsHeld") %>%
-  # sep_col("DifficultFulfillResp_Reasons") %>%
-  # sep_col("ReasonsTurnDownTravel") %>%
+  sep_col("PersonalEngagement") %>%
+  sep_col("PeopleInfluenced") %>%
+  sep_col("ReasonsForLeavingJob") %>%
+  sep_col("ReasonsForNotEnoughOppsConferences") %>%
+  sep_col("NatureWorkDiscrim") %>%
+  sep_col("BasisWorkDiscrim") %>%
+  sep_col("TrainingSubsequentActivity") %>%
+  sep_col("CareerProgressSupport") %>%
+  sep_col("ProgrammeNotCompleted_WhyEnrol") %>%
+  sep_col("ProgrammeNotCompleted_WhyNotComplete") %>%
+  sep_col("InterruptionReasons") %>%
+  sep_col("PositionsHeld") %>%
+  sep_col("DifficultFulfillResp_Reasons") %>%
+  sep_col("ReasonsTurnDownTravel") %>%
   
   filter(Consent == "I consent") %>%
   filter(iStudyOrEmployed == "Yes") %>%
@@ -183,12 +211,10 @@ read_csv("National Survey.csv") %>%
 # data.frame(InternalName = NA, iBinary = NA, ExternalName = names(dd)) %>% write_csv("ColumnNameLookupInst.csv")
 
 
-
-
 table_plus <- function(n) {
-  print(colnames(dd)[n-1])
-  print(table(dd[[n-1]]))
-  print(colnames(dd)[n-1])
+  print(colnames(dd)[n - 1])
+  print(table(   dd[[n - 1]])   )
+  print(colnames(dd)[n - 1])
 }
 
 table_plus(3)

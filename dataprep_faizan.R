@@ -29,8 +29,10 @@ sep_col <- function(dfr, colName = "PersonalEngagement") {
     mutate(across(everything(), ~replace(., !is.na(.), 1))) %>% # using replace() & replace_na() instead of ifelse() or if_else() due to speed.
     mutate(across(everything(), .fns = ~replace_na(.,0))) 
   
+  sepColumnNames = new_columns_as_dataframe %>% # Using Tyler the Great's naming convention. 
+    colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "_") %>% 
+    paste(str_to_upper(colName), ., sep = "_")
   
-  sepColumnNames = new_columns_as_dataframe %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "") %>% paste(colName, ., sep = "_")
   colnames(new_columns_as_dataframe) = sepColumnNames
   
   dfr = bind_cols(dfr, new_columns_as_dataframe)
@@ -43,7 +45,7 @@ pretty_strings <- function(string) {
   
   blankCount = str_count(string, pattern = " ")
   
-  for(i in 1:length(blankCount)){
+  for (i in 1:length(blankCount)) {
     thisBlankCount = blankCount[i]
     # If only one space, replace with \n
     if (thisBlankCount == 1) {
@@ -154,10 +156,10 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, 
   saveRDS("ISA_Raw_Ind.rds")
 
 dd = readRDS("ISA_Raw_Ind.rds")
-colnames(dd)
 
 
 ############################## Testing.  ##########################################
+colnames(dd)
 
 n <- ncol(dd) 
 n
@@ -177,11 +179,15 @@ new_columns_as_dataframe = dd %>%
   mutate(across(everything(), .fns = ~replace_na(.,0))) 
 
 
-sepColumnNames = new_columns_as_dataframe %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "") %>% paste(colName, ., sep = "_")
+sepColumnNames = new_columns_as_dataframe %>% 
+  colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "_") %>% 
+  paste(str_to_upper(colName), ., sep = "_")
+sepColumnNames
+
 colnames(new_columns_as_dataframe) = sepColumnNames
 
-dfr = bind_cols(dfr, new_columns_as_dataframe)
-dfr
+dd = bind_cols(dd, new_columns_as_dataframe)
+dd
 
 
 ########################### Testing END ####################################
