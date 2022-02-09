@@ -26,7 +26,7 @@ sep_col <- function(dfr, colName = "PersonalEngagement") {
     filter(value != "" | is.na(value)) %>%
     pivot_wider(id_cols = ID, names_from = value) %>% 
     select(-c("ID", "NA")) %>% 
-    mutate(across(everything(), ~replace(., !is.na(.), 1))) %>% 
+    mutate(across(everything(), ~replace(., !is.na(.), 1))) %>% # using replace() & replace_na() instead of ifelse() or if_else() due to speed.
     mutate(across(everything(), .fns = ~replace_na(.,0))) 
   
   
@@ -106,20 +106,20 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, 
   ## All variables to de-coalesce and count
   sep_col() %>%
   sep_col(colName = "ReasonsForNotEnoughOppsConferences") %>%
-  # sep_col(colName = "NatureWorkDiscrim") %>%
-  # sep_col(colName = "BasisWorkDiscrim") %>%
-  # sep_col(colName = "TrainingSubsequentActivity") %>%
-  # sep_col(colName = "CareerProgressSupport") %>%
-  # sep_col(colName = "ProgrammeNotCompleted_WhyEnrol") %>%
-  # sep_col(colName = "ProgrammeNotCompleted_WhyNotComplete") %>%
-  # sep_col(colName = "InterruptionReasons") %>%
-  # sep_col(colName = "PositionsHeld") %>%
-  # sep_col(colName = "ProgrammeNotCompleted_WhyEnrol_Ed") %>%
-  # sep_col(colName = "ProgrammeNotCompleted_WhyNotComplete_Ed") %>%
-  # sep_col(colName = "DifficultFulfillResp_Reasons") %>%
-  # sep_col(colName = "ReasonsTurnDownTravel_Ed") %>%
-  # sep_col(colName = "NatureWorkDiscrim_Ed") %>%
-  # sep_col(colName = "BasisWorkDiscrim_Ed") %>%
+  sep_col(colName = "NatureWorkDiscrim") %>%
+  sep_col(colName = "BasisWorkDiscrim") %>%
+  sep_col(colName = "TrainingSubsequentActivity") %>%
+  sep_col(colName = "CareerProgressSupport") %>%
+  sep_col(colName = "ProgrammeNotCompleted_WhyEnrol") %>%
+  sep_col(colName = "ProgrammeNotCompleted_WhyNotComplete") %>%
+  sep_col(colName = "InterruptionReasons") %>%
+  sep_col(colName = "PositionsHeld") %>%
+  sep_col(colName = "ProgrammeNotCompleted_WhyEnrol_Ed") %>%
+  sep_col(colName = "ProgrammeNotCompleted_WhyNotComplete_Ed") %>%
+  sep_col(colName = "DifficultFulfillResp_Reasons") %>%
+  sep_col(colName = "ReasonsTurnDownTravel_Ed") %>%
+  sep_col(colName = "NatureWorkDiscrim_Ed") %>%
+  sep_col(colName = "BasisWorkDiscrim_Ed") %>%
 
   # # select(-ends_with("_Ed")) %>%
   # filter(Consent == "I consent") %>%
