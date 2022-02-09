@@ -13,7 +13,7 @@ FieldSub,FALSE,,Please select the field that most closely describes your field o
 Gender,FALSE,,What is your gender?,117,Done,,,,,
 Age,FALSE,,What is your age?,117,G,,,,,
 StudyReasons,FALSE,,"What made you decide to study and/or work in the field of ocean science, deep-sea research and related disciplines and activities? Mark all that apply.",117,ToDo,Leave for Prof,,,Free Text,
-PeopleInfluenced,FALSE,,"People play an important role in shaping one’s career. These individuals may have supported, trained, provided advice or endorsed you in your career development. Who most influenced your choice of career? Mark all that apply.",116,ToDo,,de_coalesce,pretty_strings,,
+PeopleInfluenced,FALSE,,"People play an important role in shaping one’s career. These individuals may have supported, trained, provided advice or endorsed you in your career development. Who most influenced your choice of career? Mark all that apply.",116,ToDo,,de_coalesce,pretty_strings,?Free Text,
 Helped_Grant,FALSE,,[Obtaining a research grant or stipend],71,Done,,,,,
 Helped_Research,FALSE,,[Conducting research abroad],61,Done,,,,,
 Helped_Papers,FALSE,,[Writing academic papers or books],88,Done,,,,,

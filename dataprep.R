@@ -1,3 +1,7 @@
+# Dataprep
+
+
+
 library(tidyverse)
 
 countryLookup = read_csv("ISA – WIDSR – Country Lookup.csv", n_max = 17, na = c("N/A")) %>%
@@ -38,14 +42,14 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, 
           , NumPubs_PatentApps = as.numeric(NumPubs_PatentApps) # correct data type
           , NumPubs_Patents = as.numeric(NumPubs_Patents)
           
-          , Country                        = case_when(  str_detect(Country, 'Alice|Botsawana')       ~ 'Botswana'
-                                                         , str_detect(Country, 'Trinidad|Tobago')       ~ "Trinidad &\nTobago" 
-                                                         , str_detect(Country, 'Kitts|Nevis')           ~ "St. Kitts &\nNevis"        
-                                                         , str_detect(Country, 'Maldives')              ~ "Maldives"
-                                                         , str_detect(Country, 'Fiji')                  ~ "Fiji Islands"
-                                                         , str_detect(Country, 'Mauritus')              ~ "Mauritius"
-                                                         , str_detect(Country, 'Mocambique|Moçambique|Tabitha') ~ 'Mozambique'
-                                                         , TRUE ~ Country)
+          , Country = case_when(  str_detect(Country, 'Alice|Botsawana')       ~ 'Botswana'
+                                 , str_detect(Country, 'Trinidad|Tobago')       ~ "Trinidad &\nTobago" 
+                                 , str_detect(Country, 'Kitts|Nevis')           ~ "St. Kitts &\nNevis"        
+                                 , str_detect(Country, 'Maldives')              ~ "Maldives"
+                                 , str_detect(Country, 'Fiji')                  ~ "Fiji Islands"
+                                 , str_detect(Country, 'Mauritus')              ~ "Mauritius"
+                                 , str_detect(Country, 'Mocambique|Moçambique|Tabitha') ~ 'Mozambique'
+                                 , TRUE ~ Country)
           
           , Helped_Research       = fix_gender_col(Helped_Research)
           , Helped_Grant          = fix_gender_col(Helped_Grant)
