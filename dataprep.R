@@ -37,6 +37,31 @@ sep_col <- function(dfr, colName = "PersonalEngagement") {
   dfr
 }
 
+pretty_strings <- function(string) {
+  # string = "Marine Engineering and Technology" # Testing
+  pretty_new_lines = function(x) gsub("([^ ]+ [^ ]+) ", "\\1\n", x)
+  
+  blankCount = str_count(string, pattern = " ")
+  
+  for(i in 1:length(blankCount)){
+    thisBlankCount = blankCount[i]
+    # If only one space, replace with \n
+    if (thisBlankCount == 1) {
+      string[i] = str_replace(string[i], " ", "\n")
+      
+    } else if (thisBlankCount == 2) { # if 2 spaces, put beside longest word
+      string[i] = pretty_new_lines(string[i])
+      
+    } else if (thisBlankCount == 3) { # If 3 spaces, put after 2nd one
+      string[i] = pretty_new_lines(string[i])
+      
+    } else if (thisBlankCount > 3) { # If 4 or more, put every 2nd space
+      string[i] = pretty_new_lines(string[i])
+    }
+  }
+  return(string)
+}
+
 
 read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, na = c(""," ", "N / A", "N/A")) %>%
   
@@ -192,30 +217,6 @@ read_csv("National Survey.csv") %>%
 # dd %>% filter(!is.na(Email)) %>% select(Country, Institution, Email) %>% write_csv("EmailList.csv")
 # dd = read_csv("Institutional Survey.csv")
 # data.frame(InternalName = NA, iBinary = NA, ExternalName = names(dd)) %>% write_csv("ColumnNameLookupInst.csv")
-
-pretty_strings <- function(string) {
-  
-  pretty_new_lines = function(x) gsub("([^ ]+ [^ ]+) ", "\\1\n", x)
-  
-  blankCount = str_count(string, pattern = " ")
-  
-  # If only one space, replace with \n
-  if (blankCount == 1) {
-    string = str_replace(string, " ", "\n")
-    
-  } else if (blankCount == 2) { # if 2 spaces, put beside longest word
-    string = pretty_new_lines(string)
-    
-  } else if (blankCount == 3) { # If 3 spaces, put after 2nd one
-    string = pretty_new_lines(string)
-    
-  } else if (blankCount > 3) { # If 4 or more, put every 2nd space
-    string = pretty_new_lines(string)
-    
-  }
-  return(string)
-}
-
 
 
 table_plus <- function(n) {
