@@ -122,10 +122,10 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, 
   sep_col(colName = "BasisWorkDiscrim_Ed") %>%
 
   # # select(-ends_with("_Ed")) %>%
-  # filter(Consent == "I consent") %>%
-  # filter(iStudyOrEmployed == "Yes") %>%
-  # select(-c(Timestamp, Consent)) %>%
-  # left_join(countryLookup, by = "Country") %>%
+  filter(Consent == "I consent") %>%
+  filter(iStudyOrEmployed == "Yes") %>%
+  select(-c(Timestamp, Consent)) %>%
+  left_join(countryLookup, by = "Country") %>%
   saveRDS("ISA_Raw_Ind.rds")
 
 dd = readRDS("ISA_Raw_Ind.rds")
@@ -137,32 +137,6 @@ colnames(dd)
 n <- ncol(dd) 
 n
 dd[, (n - 10):n]
-
-dd %>% select(-c(starts_with("Helped_")
-                 , starts_with("EmploymentSatisfaction_")
-                 , starts_with("OrgHavePolicies_")
-                 , starts_with("Funding_")
-                 , starts_with("InstitutionPolicies_")
-                 )) %>% 
-  saveRDS("ISA_Ind.rds")
-
-
-# Replace NAs in a data frame
-df <- tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
-df %>% replace_na(list(x = 0, y = "unknown"))
-
-# Replace NAs in a vector
-df %>% dplyr::mutate(x = replace_na(x, 0))
-# OR
-df$x %>% replace_na(0)
-df$y %>% replace_na("unknown")
-
-# Replace NULLs in a list: NULLs are the list-col equivalent of NAs
-df_list <- tibble(z = list(1:5, NULL, 10:20))
-df_list %>% replace_na(list(z = list(5)))
-
-
-
 
 colName = "NatureWorkDiscrim"
 new_columns_as_dataframe = dd %>%
@@ -183,6 +157,19 @@ colnames(new_columns_as_dataframe) = sepColumnNames
 
 dfr = bind_cols(dfr, new_columns_as_dataframe)
 dfr
+
+
+########################### Testing END ####################################
+
+dd %>% select(-c(starts_with("Helped_")
+                 , starts_with("EmploymentSatisfaction_")
+                 , starts_with("OrgHavePolicies_")
+                 , starts_with("Funding_")
+                 , starts_with("InstitutionPolicies_")
+                 )) %>% 
+  saveRDS("ISA_Ind.rds")
+
+
 
 read_csv("Institutional Survey.csv") %>%
   rename(Country = `Please enter the name of your country.`) %>%
