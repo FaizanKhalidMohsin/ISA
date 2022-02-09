@@ -103,20 +103,21 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip=3, 
   ## All variables to de-coalesce and count
   sep_col() %>%
   sep_col(colName = "ReasonsForNotEnoughOppsConferences") %>%
-  sep_col(colName = "NatureWorkDiscrim") %>%
-  sep_col(colName = "BasisWorkDiscrim") %>%
-  sep_col(colName = "TrainingSubsequentActivity") %>%
-  sep_col(colName = "CareerProgressSupport") %>%
-  sep_col(colName = "ProgrammeNotCompleted_WhyEnrol") %>%
-  sep_col(colName = "ProgrammeNotCompleted_WhyNotComplete") %>%
-  sep_col(colName = "InterruptionReasons") %>%
-  sep_col(colName = "PositionsHeld") %>%
-  sep_col(colName = "ProgrammeNotCompleted_WhyEnrol_Ed") %>%
-  sep_col(colName = "ProgrammeNotCompleted_WhyNotComplete_Ed") %>%
-  sep_col(colName = "DifficultFulfillResp_Reasons") %>%
-  sep_col(colName = "ReasonsTurnDownTravel_Ed") %>%
-  sep_col(colName = "NatureWorkDiscrim_Ed") %>%
-  sep_col(colName = "BasisWorkDiscrim_Ed") %>%
+  # sep_col(colName = "NatureWorkDiscrim") %>%
+  # sep_col(colName = "BasisWorkDiscrim") %>%
+  # sep_col(colName = "TrainingSubsequentActivity") %>%
+  # sep_col(colName = "CareerProgressSupport") %>%
+  # sep_col(colName = "ProgrammeNotCompleted_WhyEnrol") %>%
+  # sep_col(colName = "ProgrammeNotCompleted_WhyNotComplete") %>%
+  # sep_col(colName = "InterruptionReasons") %>%
+  # sep_col(colName = "PositionsHeld") %>%
+  # sep_col(colName = "ProgrammeNotCompleted_WhyEnrol_Ed") %>%
+  # sep_col(colName = "ProgrammeNotCompleted_WhyNotComplete_Ed") %>%
+  # sep_col(colName = "DifficultFulfillResp_Reasons") %>%
+  # sep_col(colName = "ReasonsTurnDownTravel_Ed") %>%
+  # sep_col(colName = "NatureWorkDiscrim_Ed") %>%
+  # sep_col(colName = "BasisWorkDiscrim_Ed") %>%
+
   # # select(-ends_with("_Ed")) %>%
   # filter(Consent == "I consent") %>%
   # filter(iStudyOrEmployed == "Yes") %>%
@@ -143,6 +144,24 @@ dd %>% select(-c(starts_with("Helped_")
   saveRDS("ISA_Ind.rds")
 
 
+# Replace NAs in a data frame
+df <- tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
+df %>% replace_na(list(x = 0, y = "unknown"))
+
+# Replace NAs in a vector
+df %>% dplyr::mutate(x = replace_na(x, 0))
+# OR
+df$x %>% replace_na(0)
+df$y %>% replace_na("unknown")
+
+# Replace NULLs in a list: NULLs are the list-col equivalent of NAs
+df_list <- tibble(z = list(1:5, NULL, 10:20))
+df_list %>% replace_na(list(z = list(5)))
+
+
+
+
+colName = "NatureWorkDiscrim"
 new_columns_as_dataframe = dd %>%
   pull(colName) %>%
   str_split(pattern = ";", simplify = TRUE) %>%
@@ -152,7 +171,9 @@ new_columns_as_dataframe = dd %>%
   filter(value != "" | is.na(value)) %>%
   pivot_wider(id_cols = ID, names_from = value) %>% 
   select(-c("ID", "NA")) %>% 
-  replace_na(replace = 0)
+  mutate(across(everything(), ~replace(., !is.na(.), 1))) %>% 
+  mutate(across(everything(), .fns = ~replace_na(.,0))) 
+
 
 sepColumnNames = new_columns_as_dataframe %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "")
 colnames(new_columns_as_dataframe) = sepColumnNames
