@@ -25,9 +25,12 @@ sep_col <- function(dfr, colName = "PersonalEngagement") {
     pivot_longer(starts_with("V")) %>%
     filter(value != "" | is.na(value)) %>%
     pivot_wider(id_cols = ID, names_from = value) %>% 
-    select(-c("ID", "NA"))
+    select(-c("ID", "NA")) %>% 
+    mutate(across(everything(), ~replace(., !is.na(.), 1))) %>% 
+    mutate(across(everything(), .fns = ~replace_na(.,0))) 
   
-  sepColumnNames = new_columns_as_dataframe %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "")
+  
+  sepColumnNames = new_columns_as_dataframe %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "") %>% paste(colName, ., sep = "_")
   colnames(new_columns_as_dataframe) = sepColumnNames
   
   dfr = bind_cols(dfr, new_columns_as_dataframe)
@@ -175,7 +178,7 @@ new_columns_as_dataframe = dd %>%
   mutate(across(everything(), .fns = ~replace_na(.,0))) 
 
 
-sepColumnNames = new_columns_as_dataframe %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "")
+sepColumnNames = new_columns_as_dataframe %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "") %>% paste(colName, ., sep = "_")
 colnames(new_columns_as_dataframe) = sepColumnNames
 
 dfr = bind_cols(dfr, new_columns_as_dataframe)
