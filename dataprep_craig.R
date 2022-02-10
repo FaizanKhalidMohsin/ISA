@@ -142,6 +142,8 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip = 3
   filter(iStudyOrEmployed == "Yes") %>%
   select(-c(Timestamp, Consent, iStudyOrEmployed)) %>%
   left_join(countryLookup, by = "Country") %>%
+  
+  #mutate(accross(everything(), pretty_strings)) %>% 
   saveRDS("ISA_Raw_Ind.rds")
 
 dd = readRDS("ISA_Raw_Ind.rds")

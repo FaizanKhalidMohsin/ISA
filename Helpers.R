@@ -33,6 +33,29 @@ sep_col <- function(dfr, colName = "PersonalEngagement") {
 }
 
 
+
+# 
+# sep_col <- function(dfr, colName = "PersonalEngagement") {
+#   
+#   new_columns_as_dataframe = dfr %>%
+#     pull(colName) %>%
+#     str_split(pattern = ";", simplify = TRUE) %>%
+#     as.data.frame() %>%
+#     mutate(ID = row_number()) %>%
+#     pivot_longer(starts_with("V")) %>%
+#     filter(value != "" | is.na(value)) %>%
+#     pivot_wider(id_cols = ID, names_from = value) %>% 
+#     select(-c("ID", "NA"))
+#   
+#   sepColumnNames = new_columns_as_dataframe %>% colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "")
+#   colnames(new_columns_as_dataframe) = sepColumnNames
+#   
+#   dfr = bind_cols(dfr, new_columns_as_dataframe)
+#   dfr
+# }
+
+
+
 pretty_strings <- function(myString) {
   # myString = dd$Field # Testing
   pretty_new_lines = function(x) gsub("([^ ]+ [^ ]+) ", "\\1\n", x)
