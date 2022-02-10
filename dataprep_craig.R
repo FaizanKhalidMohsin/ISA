@@ -1,34 +1,6 @@
 library(tidyverse)
 source("Helpers.R")
 
-
-sep_col <- function(dfr, colName = "PersonalEngagement") {
-  
-  new_columns_as_dataframe = dfr %>%
-    pull(colName) %>%
-    str_split(pattern = ";", simplify = TRUE) %>%
-    as.data.frame() %>%
-    mutate(ID = row_number()) %>%
-    pivot_longer(starts_with("V")) %>%
-    filter(value != "" | is.na(value)) %>%
-    pivot_wider(id_cols = ID, names_from = value) %>% 
-    select(-c("ID", "NA")) %>% 
-    # Using replace() & replace_na() instead of ifelse() or if_else() due to speed.
-    mutate(across(everything(), ~replace(., !is.na(.), 1))) %>%
-    mutate(across(everything(), .fns = ~replace_na(.,0))) 
-  
-  # Using Tyler the Great's naming convention.
-  sepColumnNames = new_columns_as_dataframe %>% 
-    colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "_") %>% 
-    paste(str_to_upper(colName), ., sep = "_")
-  
-  colnames(new_columns_as_dataframe) = sepColumnNames
-  
-  dfr = bind_cols(dfr, new_columns_as_dataframe)
-  dfr
-}
-
-
 countryLookup = read_csv("ISA – WIDSR – Country Lookup.csv", n_max = 17, na = c("N/A")) %>%
   select(Country:GGI)
 
@@ -141,6 +113,14 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip = 3
           , GrantsResearchStay_International = coalesce(GrantsResearchStay_International, GrantsResearchStay_International_Ed)
           , GrantsAttendConf_National = coalesce(GrantsAttendConf_National, GrantsAttendConf_National_Ed)
           , GrantsAttendConf_International = coalesce(GrantsAttendConf_International, GrantsAttendConf_International_Ed)
+          
+          , GrantsResearchStay_National      = con_true_false(GrantsResearchStay_National)
+          , GrantsResearchStay_International = con_true_false(GrantsResearchStay_International)
+          , GrantsAttendConf_National        = con_true_false(GrantsAttendConf_National)
+          , GrantsAttendConf_International   = con_true_false(GrantsAttendConf_International)
+          
+          
+          
   ) %>% 
   select(-ends_with("_Ed")) %>% # Remove '_Ed' variables now, they have been coalesced
   
@@ -164,16 +144,46 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip = 3
   sep_col("InterruptionReasons") %>%
   sep_col("PositionsHeld") %>%
   sep_col("DifficultFulfillResp_Reasons") %>%
-  sep_col("ReasonsTurnDownTravel") %>%
+  #sep_col("ReasonsTurnDownTravel") %>%
   
   filter(Consent == "I consent") %>%
   filter(iStudyOrEmployed == "Yes") %>%
   select(-c(Timestamp, Consent, iStudyOrEmployed)) %>%
   left_join(countryLookup, by = "Country") %>%
+  
+  mutate(across(where(is.character), pretty_strings)) %>% 
   saveRDS("ISA_Raw_Ind.rds")
 
 dd = readRDS("ISA_Raw_Ind.rds")
-dd$Field = pretty_strings(dd$Field)
+# dd$Field = pretty_strings(dd$Field)
+# dd$PeopleInfluenced = pretty_strings(dd$PeopleInfluenced)
+# dd$NewPositionReason = pretty_strings(dd$NewPositionReason)
+# dd$ReasonsForLeavingJob = pretty_strings(dd$ReasonsForLeavingJob)
+# dd$ReasonsForNotEnoughOppsConferences = pretty_strings(dd$ReasonsForNotEnoughOppsConferences)
+# dd$ChildrenCaredForMethod = pretty_strings(dd$ChildrenCaredForMethod)
+# dd$ReasonsTurnDownTravel = pretty_strings(dd$ReasonsTurnDownTravel)
+# dd$NatureWorkDiscrim = pretty_strings(dd$NatureWorkDiscrim)
+# dd$BasisWorkDiscrim = pretty_strings(dd$BasisWorkDiscrim)
+# dd$iWomenMinorityOverlooked = pretty_strings(dd$iWomenMinorityOverlooked)
+# dd$iOSEquallySuitedGender = pretty_strings(dd$iOSEquallySuitedGender)
+# dd$TrainingSubsequentActivity = pretty_strings(dd$TrainingSubsequentActivity)
+# dd$CareerProgressSupport = pretty_strings(dd$CareerProgressSupport)
+# dd$PositionsHeld = pretty_strings(dd$PositionsHeld)
+# dd$Education = pretty_strings(dd$Education)
+# dd$ProgrammeNotCompleted_WhyEnrol = pretty_strings(dd$ProgrammeNotCompleted_WhyEnrol)
+# dd$ProgrammeNotCompleted_Level = pretty_strings(dd$ProgrammeNotCompleted_Level)
+# dd$FinancialSupportSource = pretty_strings(dd$FinancialSupportSource)
+# dd$FacultyAdvisorGender = pretty_strings(dd$FacultyAdvisorGender)
+# dd$InterruptionReasons = pretty_strings(dd$InterruptionReasons)
+# dd$ProgrammeNotCompleted_WhyEnrol_Ed = pretty_strings(dd$ProgrammeNotCompleted_WhyEnrol_Ed)
+# dd$ProgrammeNotCompleted_WhyNotComplete_Ed = pretty_strings(dd$ProgrammeNotCompleted_WhyNotComplete_Ed)
+# dd$DifficultFulfillResp_Reasons = pretty_strings(dd$DifficultFulfillResp_Reasons)
+# dd$iPartnerWorkingForMoney = pretty_strings(dd$iPartnerWorkingForMoney)
+# dd$NumHrsHousehold_Shopping = pretty_strings(dd$NumHrsHousehold_Shopping)
+# dd$Field = pretty_strings(dd$Field)
+# dd$Field = pretty_strings(dd$Field)
+# dd$Field = pretty_strings(dd$Field)
+# DomesticArrangement_Ed
   
 dd %>% 
   select(-c(starts_with("Helped_")

@@ -1,0 +1,20 @@
+Country,Region,Income,SIDS,LLDC,LDC,GGI,GGI ranking,Case study,Policy scan,Provided gender policy,ISA contract
+Bangladesh,Asia,Lower Middle,F,F,T,.719,65,T,TODO,T,
+Belize,Latin America and the Caribbean,Upper Middle,T,F,F,.699,90,,,T,
+Botswana,Africa,Upper Middle,F,T,F,.716,71,T,,,
+Cook Islands,Asia-Pacific,Upper Middle,T,F,F,N/A,N/A,T,,,T
+Fiji ,Asia-Pacific,Upper Middle,T,F,F,.674,113,T,Complete,T,
+Jamaica,Latin America and the Caribbean,Upper Middle,T,F,F,.741,40,T,,,
+Madagascar,Africa,Lower,F,F,T,.725,57,T,TODO,T,
+Malawi,Africa,Lower ,F,T,T,0.671,115,T,TODO,T,
+Maldives,Asia-Pacific,Upper Middle,T,F,F,.642,128,,,,
+Mauritius,Africa,High ,T,F,F,.679,110,,,,
+Mongolia,Asia-Pacific,Lower Middle,F,T,F,.716,69,T,Complete,,
+Mozambique,Africa,Lower,F,F,T,.758,32,T,TODO,,
+Nauru,Asia-Pacific,High ,T,F,F,N/A,N/A,T,Complete,,T
+Nepal,Asia,Lower Middle,F,T,T,0.681,106,T,TODO,T (in Nepali),
+Seychelles,Africa,High ,T,F,F,N/A,N/A,,,T  ,
+St. Kitts and Nevis,Latin America and the Caribbean,High ,T,F,F,N/A,N/A,,,,
+Trinidad and Tobago,Latin America and the Caribbean,High ,T,F,F,.749,37,T,T,T,
+,,,,,,,,All but 2,,,
+,,World Bank,10 total,4 total,5 total,"WEF, 2021: https://www.weforum.org/reports/global-gender-gap-report-2021/in-full/gggr2-benchmarking-gender-gaps-findings-from-the-global-gender-gap-index-2021#gggr2-benchmarking-gender-gaps-findings-from-the-global-gender-gap-index-2021",,,,,
