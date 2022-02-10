@@ -5,6 +5,12 @@ fix_gender_col <- function(x) {
             , TRUE ~ x)
 }
 
+con_true_false <- function(x) {
+  case_when(x == 0 ~ FALSE
+            , is.na(x) ~ NA
+            , TRUE ~ TRUE)
+}
+
 
 sep_col <- function(dfr, colName = "PersonalEngagement") {
   
@@ -55,6 +61,7 @@ sep_col <- function(dfr, colName = "PersonalEngagement") {
 # }
 
 
+#myString = dd$PeopleInfluenced
 
 pretty_strings <- function(myString) {
   # myString = dd$Field # Testing
@@ -63,22 +70,27 @@ pretty_strings <- function(myString) {
   blankCount = str_count(myString, pattern = " ")
   
   for(i in 1:length(blankCount)){
+    
     thisBlankCount = blankCount[i]
     
-    # If only one space, replace with \n
-    if (thisBlankCount == 1) {
-      myString[i] = str_replace(myString[i], " ", "\n")
+    if (!is.na(thisBlankCount)) {
       
-    } else if (thisBlankCount == 2) { # if 2 spaces, put beside longest word
-      myString[i] = pretty_new_lines(myString[i])
-      
-    } else if (thisBlankCount == 3) { # If 3 spaces, put after 2nd one
-      myString[i] = pretty_new_lines(myString[i])
-      
-    } else if (thisBlankCount > 3) { # If 4 or more, put every 2nd space
-      myString[i] = pretty_new_lines(myString[i])
+      # If only one space, replace with \n
+      if (thisBlankCount == 1) {
+        myString[i] = str_replace(myString[i], " ", "\n")
+        
+      } else if (thisBlankCount == 2) { # if 2 spaces, put beside longest word
+        myString[i] = pretty_new_lines(myString[i])
+        
+      } else if (thisBlankCount == 3) { # If 3 spaces, put after 2nd one
+        myString[i] = pretty_new_lines(myString[i])
+        
+      } else if (thisBlankCount > 3) { # If 4 or more, put every 2nd space
+        myString[i] = pretty_new_lines(myString[i])
+      }
     }
   }
   
   sub("–", "-", myString)
-}
+ }
+
