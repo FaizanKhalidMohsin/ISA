@@ -1,0 +1,14 @@
+---
+title: "Survey Disclaimer"
+output: html_notebook
+---
+
+
+### Discussion of limitations of survey.
+
+Write disclaimer/note about the types of conclusions we can and cannot draw from the data we collected, about our non-random sample, including size.
+
+
+
+**Important disclaimer:** The results of this survey cannot be generalized too broadly beyond the sample since it was a self-selection survey conducted online where participation was voluntary. Hence, it is subject to self-selection bias and access to reliable internet, thereby failing to ensure that our sample properly represents the target population and may over or underrepresent the different subsets of the population, causing our survey estimates and results to likely be biased. For example, the estimated average income found in our survey could in fact be much lower or higher than the average income of the actual target population. Further, as participation was voluntary, the sample was not randomly selected nor controlled for any confounding variables, hence as we have a non-randomized sample any statistically significant results could be simply due to hazard or due to unobserved variables not captured in the survey. For example, findings that there is or is no relationship between variables could simply be because we happen to obtain such a particular sample by hazard, and it may not represent the actual relationship present in the target population. Furthermore, no power analysis was done a prior to determine the minimum sample size needed to detect statistically significant effect. Rather, as many participants as possible were requested to fill the survey. Hence, any lack of significant result may be because the sample size was not large enough to detect or capture the effect. For example, no relationship between participant's education level and their income, could be because the difference was not large enough to be detected for our sample size and a larger sample size was required. In conclusion, generalizing the results of this survey beyond the sample must be done with caution and the results should be considered with potential biases that may be present.
+
