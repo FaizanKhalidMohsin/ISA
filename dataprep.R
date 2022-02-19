@@ -1,34 +1,6 @@
 library(tidyverse)
 source("Helpers.R")
 
-
-sep_col <- function(dfr, colName = "PersonalEngagement") {
-  
-  new_columns_as_dataframe = dfr %>%
-    pull(colName) %>%
-    str_split(pattern = ";", simplify = TRUE) %>%
-    as.data.frame() %>%
-    mutate(ID = row_number()) %>%
-    pivot_longer(starts_with("V")) %>%
-    filter(value != "" | is.na(value)) %>%
-    pivot_wider(id_cols = ID, names_from = value) %>% 
-    select(-c("ID", "NA")) %>% 
-    # Using replace() & replace_na() instead of ifelse() or if_else() due to speed.
-    mutate(across(everything(), ~replace(., !is.na(.), 1))) %>%
-    mutate(across(everything(), .fns = ~replace_na(.,0))) 
-  
-  # Using Tyler the Great's naming convention.
-  sepColumnNames = new_columns_as_dataframe %>% 
-    colnames() %>%  str_to_title() %>% str_replace_all(pattern = " ", replacement = "_") %>% 
-    paste(str_to_upper(colName), ., sep = "_")
-  
-  colnames(new_columns_as_dataframe) = sepColumnNames
-  
-  dfr = bind_cols(dfr, new_columns_as_dataframe)
-  dfr
-}
-
-
 countryLookup = read_csv("ISA – WIDSR – Country Lookup.csv", n_max = 17, na = c("N/A")) %>%
   select(Country:GGI)
 
@@ -51,17 +23,8 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip = 3
                                                 , TRUE ~ Country)
           
           , Age = fct_relevel(Age, c("18 - 24", "25 - 34"))
-          # , Field = pretty_strings(Field)
-          
-          , Helped_Research       = fix_gender_col(Helped_Research)
-          , Helped_Grant          = fix_gender_col(Helped_Grant)
-          , Helped_Papers         = fix_gender_col(Helped_Papers)
-          , Helped_Position       = fix_gender_col(Helped_Position)
-          , Helped_Programme      = fix_gender_col(Helped_Programme)
-          , Helped_Apprenticeship = fix_gender_col(Helped_Apprenticeship)
-          , Helped_Employment     = fix_gender_col(Helped_Employment)
-          , Helped_Study          = fix_gender_col(Helped_Study)
-          , Helped_SupportEducation = fix_gender_col(Helped_SupportEducation)
+          , CurrentSituation = ifelse(grepl("enrolled", CurrentSituation), "Studying", "Working")
+          , AnnualEarnings = clean_money(AnnualEarnings)
           
           , CareerBreakReason              = case_when(CareerBreakReason == "Care for family member (other than children)" ~ "Care for family member \n(other than children)"
                                                        , CareerBreakReason == "parental leave and health" ~ "parental leave \nand health"
@@ -97,15 +60,14 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip = 3
           , iWomenMinorityOverlooked       = case_when(str_detect(iWomenMinorityOverlooked, 'No') ~  'Equitable \nTreatment'
                                                        , str_detect(iWomenMinorityOverlooked, 'Yes') ~  'Inequitable \nTreatment')
           
-          
-          , NumPubs_Articles               = if_else(NumPubs_Articles == 0.1, 0, NumPubs_Articles)
-          , NumPubs_Books                  = if_else(NumPubs_Books == 0.1, 0, NumPubs_Books)
-          , NumPubs_Chapters               = if_else(NumPubs_Chapters == 0.1, 0, NumPubs_Chapters)
-          , NumPubs_PatentApps             = if_else(NumPubs_PatentApps == 0.1, 0, NumPubs_PatentApps)
-          , NumPubs_Patents                = if_else(NumPubs_Patents == 0.1, 0, NumPubs_Patents)
-          
-          ## Try to replace the above NumPubs_* with one line code as below. 
-          ## %>% mutate_at(vars(contains("NumPubs")), list(~case_when(.==0.1 ~ 0, TRUE ~ .x ) # Right now this .x does not work.
+          ## Deal with numerics
+          , Months = parse_number(MonthsUntilWork)
+          , Months = ifelse(grepl("(a )|(an )", MonthsUntilWork, ignore.case = T), 1, Months)
+          , Months = ifelse(grepl("(already)|(immediat)|(finish)|(before)", MonthsUntilWork, ignore.case = T), 0, Months)
+          , Months = ifelse(grepl("one", MonthsUntilWork, ignore.case = T), 1, Months)
+          , Months = ifelse(grepl("two", MonthsUntilWork, ignore.case = T), 2, Months)
+          , Months = ifelse(grepl("nine", MonthsUntilWork, ignore.case = T), 9, Months)
+          , MonthsUntilWorkNum = ifelse(grepl("year", MonthsUntilWork, ignore.case = T), Months*12, Months)
           
           ## Coalesce all _Ed variables
           , AwareGenderPayGap = coalesce(AwareGenderPayGap, AwareGenderPayGap_Ed)
@@ -142,6 +104,10 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip = 3
           , GrantsAttendConf_National = coalesce(GrantsAttendConf_National, GrantsAttendConf_National_Ed)
           , GrantsAttendConf_International = coalesce(GrantsAttendConf_International, GrantsAttendConf_International_Ed)
   ) %>% 
+  mutate(across(starts_with("Helped_"), fix_gender_col)) %>%
+  mutate(across(starts_with("NumPubs"), function(x){if_else(x == 0.1, 0, x)})) %>%
+  mutate(across(starts_with("Funding_"), function(x){if_else(x %in% c("5-6", "7-8", "9-10", "10+"), "5+", x)})) %>%
+  mutate(across(starts_with("Grants"), con_true_false)) %>%
   select(-ends_with("_Ed")) %>% # Remove '_Ed' variables now, they have been coalesced
   
   ## All variables to de-coalesce and count
@@ -153,10 +119,12 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip = 3
   # TODO: Faizan - 
   sep_col("PersonalEngagement") %>%
   sep_col("PeopleInfluenced") %>%
+  sep_col("StudyReasons") %>%
   sep_col("ReasonsForLeavingJob") %>%
   sep_col("ReasonsForNotEnoughOppsConferences") %>%
   sep_col("NatureWorkDiscrim") %>%
   sep_col("BasisWorkDiscrim") %>%
+  sep_col("PersonalHarassed") %>%
   sep_col("TrainingSubsequentActivity") %>%
   sep_col("CareerProgressSupport") %>%
   sep_col("ProgrammeNotCompleted_WhyEnrol") %>%
@@ -170,37 +138,90 @@ read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip = 3
   filter(iStudyOrEmployed == "Yes") %>%
   select(-c(Timestamp, Consent, iStudyOrEmployed)) %>%
   left_join(countryLookup, by = "Country") %>%
+  
+  # mutate(across(where(is.character), pretty_strings)) %>% 
   saveRDS("ISA_Raw_Ind.rds")
 
 dd = readRDS("ISA_Raw_Ind.rds")
+
+# dd %>% select(MonthsUntilWork, Months, MonthsUntilWorkNum) %>% print(n = 150)
+
+dd$Country = pretty_strings(dd$Country)
 dd$Field = pretty_strings(dd$Field)
+dd$Institution = pretty_strings(dd$Institution)
+# dd$PeopleInfluenced = pretty_strings(dd$PeopleInfluenced)
+# dd$NewPositionReason = pretty_strings(dd$NewPositionReason)
+# dd$ReasonsForLeavingJob = pretty_strings(dd$ReasonsForLeavingJob)
+# dd$ReasonsForNotEnoughOppsConferences = pretty_strings(dd$ReasonsForNotEnoughOppsConferences)
+# dd$ChildrenCaredForMethod = pretty_strings(dd$ChildrenCaredForMethod)
+# dd$ReasonsTurnDownTravel = pretty_strings(dd$ReasonsTurnDownTravel)
+# dd$NatureWorkDiscrim = pretty_strings(dd$NatureWorkDiscrim)
+# dd$BasisWorkDiscrim = pretty_strings(dd$BasisWorkDiscrim)
+dd$iWomenMinorityOverlooked = pretty_strings(dd$iWomenMinorityOverlooked)
+dd$iOSEquallySuitedGender = pretty_strings(dd$iOSEquallySuitedGender)
+# dd$TrainingSubsequentActivity = pretty_strings(dd$TrainingSubsequentActivity)
+# dd$CareerProgressSupport = pretty_strings(dd$CareerProgressSupport)
+# dd$PositionsHeld = pretty_strings(dd$PositionsHeld)
+# dd$Education = pretty_strings(dd$Education)
+# dd$ProgrammeNotCompleted_WhyEnrol = pretty_strings(dd$ProgrammeNotCompleted_WhyEnrol)
+# dd$ProgrammeNotCompleted_Level = pretty_strings(dd$ProgrammeNotCompleted_Level)
+# dd$FinancialSupportSource = pretty_strings(dd$FinancialSupportSource)
+# dd$FacultyAdvisorGender = pretty_strings(dd$FacultyAdvisorGender)
+# dd$InterruptionReasons = pretty_strings(dd$InterruptionReasons)
+# dd$ProgrammeNotCompleted_WhyEnrol_Ed = pretty_strings(dd$ProgrammeNotCompleted_WhyEnrol_Ed)
+# dd$ProgrammeNotCompleted_WhyNotComplete_Ed = pretty_strings(dd$ProgrammeNotCompleted_WhyNotComplete_Ed)
+# dd$DifficultFulfillResp_Reasons = pretty_strings(dd$DifficultFulfillResp_Reasons)
+# dd$iPartnerWorkingForMoney = pretty_strings(dd$iPartnerWorkingForMoney)
+# dd$NumHrsHousehold_Shopping = pretty_strings(dd$NumHrsHousehold_Shopping)
+# DomesticArrangement_Ed
   
 dd %>% 
   select(-c(starts_with("Helped_")
-                 , starts_with("EmploymentSatisfaction_")
-                 , starts_with("PoliciesInOrg_")
-                 , starts_with("OrgHavePolicies_")
-                 , starts_with("Funding_")
-                 , starts_with("InstitutionPolicies_")
-                 , starts_with("ActivityFrequency_")
+            , starts_with("EmploymentSatisfaction_", ignore.case = T)
+            , starts_with("PoliciesInOrg_", ignore.case = T)
+            , starts_with("OrgHavePolicies_", ignore.case = T)
+            , starts_with("InstitutionPolicies_", ignore.case = T)
+            , starts_with("OverallExperienceProgramme_", ignore.case = T)
+            , starts_with("StudyReasons", ignore.case = T)
+            , starts_with("PERSONALENGAGEMENT", ignore.case = T)
+            , starts_with("PEOPLEINFLUENCED", ignore.case = T)
+            , starts_with("REASONSFORLEAVINGJOB", ignore.case = T)
+            , starts_with("REASONSFORNOTENOUGHOPPSCONFERENCES", ignore.case = T)
+            , starts_with("NATUREWORKDISCRIM", ignore.case = T)
+            , starts_with("BASISWORKDISCRIM", ignore.case = T)
+            , starts_with("PersonalHarassed", ignore.case = T)
+            , starts_with("TRAININGSUBSEQUENTACTIVITY", ignore.case = T)
+            , starts_with("CAREERPROGRESSSUPPORT", ignore.case = T)
+            , starts_with("PROGRAMMENOTCOMPLETED_WHYENROL", ignore.case = T)
+            , starts_with("PROGRAMMENOTCOMPLETED_WHYNOTCOMPLETE", ignore.case = T)
+            , starts_with("INTERRUPTIONREASONS", ignore.case = T)
+            , starts_with("POSITIONSHELD", ignore.case = T)
+            , starts_with("DIFFICULTFULFILLRESP_REASONS", ignore.case = T)
+            , starts_with("ReasonsTurnDownTravel", ignore.case = T)
+            , starts_with("Funding_", ignore.case = T)
+            , starts_with("Grants", ignore.case = T)
+            , starts_with("ActivityFrequency_", ignore.case = T)
+            , starts_with("ParentalLeave_", ignore.case = T)
+            , starts_with("NumHrsHousehold_", ignore.case = T)
+            , starts_with("Dependants_", ignore.case = T)
                  )) %>% 
   saveRDS("ISA_Ind.rds")
+# tt = readRDS("ISA_Ind.rds")
 
 
-
-read_csv("Institutional Survey.csv") %>%
-  rename(Country = `Please enter the name of your country.`) %>%
-  mutate(
-    Country = str_to_title(Country)
-  ) %>%
-  saveRDS("ISA_Raw_Inst.rds")
-
-read_csv("National Survey.csv") %>%
-  rename(Country = `Please enter the name of your country.`) %>%
-  mutate(
-    Country = str_to_title(Country)
-  ) %>%
-  saveRDS("ISA_Raw_NFP.rds")
+# read_csv("Institutional Survey.csv") %>%
+#   rename(Country = `Please enter the name of your country.`) %>%
+#   mutate(
+#     Country = str_to_title(Country)
+#   ) %>%
+#   saveRDS("ISA_Raw_Inst.rds")
+# 
+# read_csv("National Survey.csv") %>%
+#   rename(Country = `Please enter the name of your country.`) %>%
+#   mutate(
+#     Country = str_to_title(Country)
+#   ) %>%
+#   saveRDS("ISA_Raw_NFP.rds")
 
 
 
@@ -217,7 +238,7 @@ table_plus <- function(n) {
   print(colnames(dd)[n - 1])
 }
 
-table_plus(3)
+# table_plus(3)
 
 
 #FFFFFF	RGB(255, 255, 255)	0.77042
