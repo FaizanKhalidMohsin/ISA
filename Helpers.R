@@ -43,14 +43,44 @@ clean_money <- function(x) {
   sub(" ", ",", x) %>% parse_number()
 }
 
+# pretty_strings <- function(myString) {
+#   # myString = dd$Field # Testing
+#   pretty_new_lines = function(x) gsub("([^ ]+ [^ ]+) ", "\\1\n", x)
+#   
+#   blankCount = str_count(myString, pattern = " ")
+#   
+#   for(i in 1:length(blankCount)){
+#     thisBlankCount = blankCount[i]
+#     
+#     # If only one space, replace with \n
+#     if (thisBlankCount == 1) {
+#       myString[i] = str_replace(myString[i], " ", "\n")
+#       
+#     } else if (thisBlankCount == 2) { # if 2 spaces, put beside longest word
+#       myString[i] = pretty_new_lines(myString[i])
+#       
+#     } else if (thisBlankCount == 3) { # If 3 spaces, put after 2nd one
+#       myString[i] = pretty_new_lines(myString[i])
+#       
+#     } else if (thisBlankCount > 3) { # If 4 or more, put every 2nd space
+#       myString[i] = pretty_new_lines(myString[i])
+#     }
+#   }
+#   
+#   sub("–", "-", myString)
+# }
+
+
 pretty_strings <- function(myString) {
   # myString = dd$Field # Testing
+  # myString = ind$Region
   pretty_new_lines = function(x) gsub("([^ ]+ [^ ]+) ", "\\1\n", x)
   
   blankCount = str_count(myString, pattern = " ")
   
   for(i in 1:length(blankCount)){
     thisBlankCount = blankCount[i]
+    if(is.na(thisBlankCount)) next
     
     # If only one space, replace with \n
     if (thisBlankCount == 1) {
@@ -67,8 +97,9 @@ pretty_strings <- function(myString) {
     }
   }
   
-  sub("–", "-", myString)
+  sub("-", "-", myString)
 }
+
 
 count_unigrams <- function(vec, stop_words) {
   # vec = ind$StudyReasons[!is.na(ind$StudyReasons)]
