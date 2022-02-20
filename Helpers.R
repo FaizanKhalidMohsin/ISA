@@ -120,6 +120,6 @@ stop_words_custom = data.frame(
 
 # Create Function that passes in a row number returns html file (Rmarkdown file) which has all their answers they responded ideally on one page.
 
-
-
+https://stackoverflow.com/questions/53303221/how-to-write-a-r-function-that-writes-a-rmarkdown-file
+https://stackoverflow.com/questions/40949035/how-to-output-an-html-file-in-an-r-function
 
