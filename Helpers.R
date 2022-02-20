@@ -117,3 +117,9 @@ stop_words_custom = data.frame(
   lexicon = rep("CUSTOM", length(customWords))
 ) %>%
   rbind(stop_words)
+
+# Create Function that passes in a row number returns html file (Rmarkdown file) which has all their answers they responded ideally on one page.
+
+
+
+
