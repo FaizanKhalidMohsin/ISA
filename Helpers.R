@@ -118,24 +118,3 @@ stop_words_custom = data.frame(
 ) %>%
   rbind(stop_words)
 
-# Create Function that passes in a row number returns html file (Rmarkdown file) which has all their answers they responded ideally on one page.
-
-row_ans <- function(df, rowNum) {
-  df %>% slice(rowNum) %>% t() %>% na.omit(.) %>% kable()
-}
-
-##https://stackoverflow.com/questions/53303221/how-to-write-a-r-function-that-writes-a-rmarkdown-file
-##https://stackoverflow.com/questions/40949035/how-to-output-an-html-file-in-an-r-function
-
-
-# Rendering script:
-
-species <- c("setosa", "versicolor", "virginica")
-
-sapply(species, function(x) {
-  rmarkdown::render(input = "iris_params.Rmd", 
-                    output_file = sprintf("iris_params_%s.html", x),
-                    params = list(species = x))
-})
-
-
