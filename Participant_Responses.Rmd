@@ -1,118 +1,49 @@
 ---
 title: "Participant Responses"
-author: "Faizan Khalid Mohsin"
-date: "February 20, 2022"
+author: ""
+date: ""
 output: html_document
+params:
+  rowNum: 1
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = F)
 
 ```
 
 
-```{r packages}
+```{r packages, include=F}
 library(knitr)
-library(pander)
+library(tidyverse)
 library(kableExtra)
 ```
 
 
 
 ```{r iris}
-species <- params$species
-summary(iris[iris$Species == species, ])
+rowNum <- params$rowNum
 ```
 
 
 
 ```{r}
-ourNamesInd = read_csv("ColumnNameLookupInd.csv")
-##aa = read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip = 3, na = c(""," ", "N / A"))
-aa = read_csv("Individual Survey.csv", skip = 3, na = c(""," ", "N / A"))
-dd = readRDS("ISA_Raw_Ind.rds")
+# ourNamesInd = read_csv("ColumnNameLookupInd.csv")
+# ##aa = read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip = 3, na = c(""," ", "N / A"))
+# aa = read_csv("Individual Survey.csv", skip = 3, na = c(""," ", "N / A"))
+# dd = readRDS("ISA_Raw_Ind.rds")
 tt = readRDS("ISA_Ind.rds")
 ```
 
-```{r}
-aa %>% slice(1) %>% kable()
-```
-
 
 ```{r}
-aa %>% slice(1) %>% t() %>% kable()
-```
-
-
-```{r}
-dd %>% slice(1) %>% kable()
-```
-
-
-
-```{r}
-dd %>% slice(1) %>% t() %>% kable()
-```
-
-
-```{r}
-
-tt %>% slice(1) %>% t() %>% na.omit(.) %>% kable()# %>% as_tibble() %>% kable() #%>% drop_na() %>% kable() #%>% filter( complete.cases(.) )
-
-
-
-
-```
-
-
-
-
-
-```{r}
-row_ans <- function(df, row) {
-  df %>% slice(row) %>% t() %>% na.omit(.) %>% kable()
+row_ans <- function(df, rowNum) {
+  df %>% slice(rowNum) %>% t() %>% na.omit(.) %>% kable()
 }
 
-
-row_ans(tt, 1)
-
-row_ans(tt, 2)
-
-row_ans(aa, 1)
-
+row_ans(tt, rowNum)
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
