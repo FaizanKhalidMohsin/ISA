@@ -35,6 +35,7 @@ rowNum <- params$rowNum
 tt = readRDS("ISA_Ind.rds")
 ```
 
+### Participant row number `r rowNum`
 
 ```{r}
 row_ans <- function(df, rowNum) {
