@@ -5,3 +5,115 @@ date: "February 20, 2022"
 output: html_document
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
+```{r packages}
+library(knitr)
+library(pander)
+library(kableExtra)
+```
+
+
+
+```{r iris}
+species <- params$species
+summary(iris[iris$Species == species, ])
+```
+
+
+
+```{r}
+ourNamesInd = read_csv("ColumnNameLookupInd.csv")
+##aa = read_csv("Individual Survey.csv", col_names = ourNamesInd$InternalName, skip = 3, na = c(""," ", "N / A"))
+aa = read_csv("Individual Survey.csv", skip = 3, na = c(""," ", "N / A"))
+dd = readRDS("ISA_Raw_Ind.rds")
+tt = readRDS("ISA_Ind.rds")
+```
+
+```{r}
+aa %>% slice(1) %>% kable()
+```
+
+
+```{r}
+aa %>% slice(1) %>% t() %>% kable()
+```
+
+
+```{r}
+dd %>% slice(1) %>% kable()
+```
+
+
+
+```{r}
+dd %>% slice(1) %>% t() %>% kable()
+```
+
+
+```{r}
+
+tt %>% slice(1) %>% t() %>% na.omit(.) %>% kable()# %>% as_tibble() %>% kable() #%>% drop_na() %>% kable() #%>% filter( complete.cases(.) )
+
+
+
+
+```
+
+
+
+
+
+```{r}
+row_ans <- function(df, row) {
+  df %>% slice(row) %>% t() %>% na.omit(.) %>% kable()
+}
+
+
+row_ans(tt, 1)
+
+row_ans(tt, 2)
+
+row_ans(aa, 1)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
